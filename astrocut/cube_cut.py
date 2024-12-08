@@ -791,6 +791,7 @@ class CutoutFactory():
         cube_file,
         coordinates,
         cutout_size,
+        cutout_indecies=None,
         product="SPOC",
         target_pixel_file=None,
         output_path=".",
@@ -869,31 +870,39 @@ class CutoutFactory():
             # Get the info we need from the data table
             self._parse_table_info(cube[2].data, verbose)
 
-            if isinstance(coordinates, SkyCoord):
-                self.center_coord = coordinates
-            else:
-                self.center_coord = SkyCoord(coordinates, unit='deg')
 
-            log.debug("Cutout center coordinate: %s, %s", self.center_coord.ra.deg, self.center_coord.dec.deg)
+            if cutout_indecies is None:
+                if isinstance(coordinates, SkyCoord):
+                    self.center_coord = coordinates
+                else:
+                    self.center_coord = SkyCoord(coordinates, unit='deg')
 
-            # Making size into an array [ny, nx]
-            if np.isscalar(cutout_size):
-                cutout_size = np.repeat(cutout_size, 2)
+                log.debug("Cutout center coordinate: %s, %s", self.center_coord.ra.deg, self.center_coord.dec.deg)
 
-            if isinstance(cutout_size, u.Quantity):
-                cutout_size = np.atleast_1d(cutout_size)
-                if len(cutout_size) == 1:
+                # Making size into an array [ny, nx]
+                if np.isscalar(cutout_size):
                     cutout_size = np.repeat(cutout_size, 2)
 
-            if len(cutout_size) > 2:
-                warnings.warn("Too many dimensions in cutout size, only the first two will be used.",
-                              InputWarning)
-                cutout_size = cutout_size[:2]
+                if isinstance(cutout_size, u.Quantity):
+                    cutout_size = np.atleast_1d(cutout_size)
+                    if len(cutout_size) == 1:
+                        cutout_size = np.repeat(cutout_size, 2)
+
+                if len(cutout_size) > 2:
+                    warnings.warn("Too many dimensions in cutout size, only the first two will be used.",
+                                InputWarning)
+                    cutout_size = cutout_size[:2]
                 
-            # Get cutout limits
-            self._get_cutout_limits(cutout_size)
-            log.debug("xmin,xmax: %s", self.cutout_lims[1])
-            log.debug("ymin,ymax: %s", self.cutout_lims[0])
+                # Get cutout limits
+                self._get_cutout_limits(cutout_size)
+                log.debug("xmin,xmax: %s", self.cutout_lims[1])
+                log.debug("ymin,ymax: %s", self.cutout_lims[0])
+
+            else:
+                log.debug("[entering Ben's modified section]")
+                self.cutout_lims = cutout_indecies
+                log.debug("xmin,xmax: %s", self.cutout_lims[1])
+                log.debug("ymin,ymax: %s", self.cutout_lims[0])
 
             # Make the cutout
             img_cutout, uncert_cutout, aperture = self._get_cutout(getattr(cube[1], cube_data_prop), threads=threads,
