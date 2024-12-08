@@ -915,6 +915,13 @@ class CutoutFactory():
             log.debug("Error in approximate WCS (sigma): %.4f", sigma)
                 
             cutout_wcs_dict = self._get_cutout_wcs_dict()
+            if cutout_indecies is not None:
+                log.debug("[more modified stuff]")
+                ymid = (cutout_indecies[0][0] + cutout_indecies[0][1]) // 2
+                xmid = (cutout_indecies[1][0] + cutout_indecies[1][1]) // 2
+                self.center_coord = self.cube_wcs.pixel_to_world(ymid, xmid)
+                print(self.center_coord)
+
     
             # Build the TPF
             tpf_object = self._build_tpf(cube, img_cutout, uncert_cutout, cutout_wcs_dict, aperture)
