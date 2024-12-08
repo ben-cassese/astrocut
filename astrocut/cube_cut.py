@@ -920,7 +920,7 @@ class CutoutFactory():
                 ymid = (cutout_indecies[0][0] + cutout_indecies[0][1]) // 2
                 xmid = (cutout_indecies[1][0] + cutout_indecies[1][1]) // 2
                 self.center_coord = self.cube_wcs.pixel_to_world(ymid, xmid)
-                print(self.center_coord)
+                log.debug(f"new center ra: {self.center_coord.ra.deg}, dec: {self.center_coord.dec.deg}")
 
     
             # Build the TPF
