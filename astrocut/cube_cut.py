@@ -792,6 +792,7 @@ class CutoutFactory():
         coordinates,
         cutout_size,
         cutout_indecies=None,
+        mem_only=False,
         product="SPOC",
         target_pixel_file=None,
         output_path=".",
@@ -925,6 +926,8 @@ class CutoutFactory():
     
             # Build the TPF
             tpf_object = self._build_tpf(cube, img_cutout, uncert_cutout, cutout_wcs_dict, aperture)
+            if mem_only:
+                return tpf_object
 
             write_time = monotonic()
 
